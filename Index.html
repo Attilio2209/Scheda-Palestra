@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheda Palestra</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- VISTA 1: SELEZIONE GIORNO -->
+        <div id="view-day-selection" class="view active">
+            <h1>Scheda Palestra</h1>
+            <p>Seleziona il giorno per iniziare il tuo allenamento.</p>
+            <select id="day-selector">
+                <option value="Lunedì">Lunedì</option>
+                <option value="Martedì">Martedì</option>
+                <option value="Mercoledì">Mercoledì</option>
+                <option value="Giovedì">Giovedì</option>
+                <option value="Venerdì">Venerdì</option>
+                <option value="Sabato">Sabato</option>
+                <option value="Domenica">Domenica</option>
+            </select>
+            <button id="show-workout-btn">Mostra Allenamento</button>
+            <hr>
+            <button id="go-to-editor-btn">Crea / Modifica Scheda</button>
+            <div class="metadata">
+                <p>Scheda creata il: <span id="creation-date">--</span></p>
+                <p>Utilizzi totali della scheda: <span id="usage-count">0</span></p>
+            </div>
+        </div>
+
+        <!-- VISTA 2: ELENCO ESERCIZI -->
+        <div id="view-exercise-list" class="view">
+            <button id="back-to-day-selection-btn">← Cambia Giorno</button>
+            <h2 id="list-day-title"></h2>
+            <ul id="exercise-list"></ul>
+        </div>
+
+        <!-- VISTA 3: DETTAGLIO ESERCIZIO (CON GRIGLIA INTERATTIVA) -->
+        <div id="view-exercise-detail" class="view">
+            <button id="back-to-list-btn">← Torna alla lista</button>
+            <h2 id="detail-exercise-name">Nome Esercizio</h2>
+            <div id="detail-photo-container">
+                <img id="detail-photo" src="" alt="Immagine esercizio">
+            </div>
+            
+            <div class="detail-grid">
+                <!-- Set (con stepper) -->
+                <div>
+                    <strong>Set</strong>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-field="set" data-step="-1">-</button>
+                        <span class="stepper-value" id="detail-sets">0</span>
+                        <button class="stepper-btn" data-field="set" data-step="1">+</button>
+                    </div>
+                </div>
+                <!-- Ripetute (campo editabile) -->
+                <div>
+                    <strong>Ripetute</strong>
+                    <input type="text" class="editable-field" id="detail-reps">
+                </div>
+                <!-- Durata (campo editabile) -->
+                 <div>
+                    <strong>Durata</strong>
+                    <input type="text" class="editable-field" id="detail-duration" placeholder="es. 01:30">
+                </div>
+                <!-- Peso (con stepper) -->
+                <div>
+                    <strong>Peso (Kg)</strong>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-field="peso" data-step="-0.5">-</button>
+                        <span class="stepper-value" id="detail-weight">0</span>
+                        <button class="stepper-btn" data-field="peso" data-step="0.5">+</button>
+                    </div>
+                </div>
+                <!-- Recupero (con stepper) -->
+                <div>
+                    <strong>Recupero (sec)</strong>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-field="recupero" data-step="-5">-</button>
+                        <span class="stepper-value" id="detail-recovery">0</span>
+                        <button class="stepper-btn" data-field="recupero" data-step="5">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="mark-as-done-btn">ESEGUITO</button>
+        </div>
+
+        <!-- VISTA 4: EDITOR SCHEDA (CORRETTO) -->
+        <div id="view-editor" class="view">
+            <button id="back-from-editor-btn">← Torna alla Home</button>
+            <h2>Editor Scheda</h2>
+            <form id="add-exercise-form">
+                <h3>Aggiungi Nuovo Esercizio</h3>
+                <select name="giorno" required>
+                    <option value="" disabled selected>Seleziona Giorno</option>
+                    <option value="Lunedì">Lunedì</option>
+                    <option value="Martedì">Martedì</option>
+                    <option value="Mercoledì">Mercoledì</option>
+                    <option value="Giovedì">Giovedì</option>
+                    <option value="Venerdì">Venerdì</option>
+                    <option value="Sabato">Sabato</option>
+                    <option value="Domenica">Domenica</option>
+                </select>
+                <input type="text" name="nome" placeholder="Nome Esercizio" required>
+                <input type="number" name="set" placeholder="Set" required>
+                <input type="text" name="ripetute" placeholder="Ripetute (es. 10-12)" required>
+                <input type="text" name="durata" placeholder="Durata (es. 01:30)">
+                <input type="number" name="peso" placeholder="Peso (Kg)">
+                <input type="number" name="recupero" placeholder="Recupero (secondi)" required>
+                <input type="url" name="foto" placeholder="URL Foto Esercizio">
+                <button type="submit">Aggiungi Esercizio</button>
+            </form>
+            <hr>
+            <h3>Esercizi Esistenti</h3>
+            <div id="existing-exercises-list"></div>
+        </div>
+
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
