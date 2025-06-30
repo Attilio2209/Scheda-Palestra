@@ -127,42 +127,24 @@
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
 
 <script>
-      <!-- ======================================================= -->
-    <!-- INIZIO PARTE DA AGGIUNGERE -->
-    <!-- ======================================================= -->
+  // La TUA configurazione del progetto Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSy...tuo-api-key",
+    authDomain: "tuo-progetto.firebaseapp.com",
+    projectId: "tuo-progetto",
+    storageBucket: "tuo-progetto.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abcdef123456"
+  };
 
-    <!-- Firebase SDK (Software Development Kit) -->
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+  // Inizializza Firebase
+  firebase.initializeApp(firebaseConfig);
 
-    <script>
-      // La TUA configurazione del progetto Firebase (PRESA DAL TUO SCREENSHOT)
-      const firebaseConfig = {
-        apiKey: "AIzaSyAP7t7sIq_IQB-R2ZYoSrBdFOCJiN3kifE",
-        authDomain: "scheda-palestra-app.firebaseapp.com",
-        projectId: "scheda-palestra-app",
-        storageBucket: "scheda-palestra-app.firebaseapp.com",
-        messagingSenderId: "72763855410",
-        appId: "1:72763855410:web:280b8c2902f7bb60f2a22b",
-        measurementId: "G-LZBSX8FSPN"
-      };
+  // Rendi disponibili i servizi di Firebase per il tuo script
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
 
-      // Inizializza Firebase
-      firebase.initializeApp(firebaseConfig);
-
-      // Rendi disponibili i servizi di Firebase per il tuo script.js
-      const auth = firebase.auth();
-      const db = firebase.firestore();
-    </script>
-
-    <!-- ======================================================= -->
-    <!-- FINE PARTE DA AGGIUNGERE -->
-    <!-- ======================================================= -->
-
-
-    <!-- Il tuo script principale (QUESTO GIÀ C'È NEL TUO FILE) -->
-    <script src="script.js"></script>
 <!-- Il tuo script principale -->
 <script src="script.js"></script>
     <script src="script.js"></script>
