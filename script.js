@@ -1,8 +1,5 @@
-// =========================================================================
-// ========= CODICE NUOVO E COMPLETO (CHE SOSTITUISCE QUELLO VECCHIO) ========
-// =========================================================================
-
 // --- 1. INIZIALIZZAZIONE DI FIREBASE ---
+// Questa parte è corretta e la teniamo
 const firebaseConfig = {
   apiKey: "AIzaSyAP7t7sIq_IQb-R2ZYoSrBdFOCJiN3kifE",
   authDomain: "scheda-palestra-app.firebaseapp.com",
@@ -17,89 +14,98 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// --- 2. GESTIONE DELL'INTERFACCIA UTENTE (UI) ---
+// Raggruppiamo tutti gli elementi dell'interfaccia qui
+const ui = {
+    loginBtn: document.getElementById('login-btn'),
+    logoutBtn: document.getElementById('logout-btn'),
+    userInfo: document.getElementById('user-info'),
+    userName: document.getElementById('user-name'),
+    schedaContainer: document.getElementById('scheda-container')
+};
 
-// --- 2. SELETTORI PER GLI ELEMENTI HTML ---
-const loginBtn = document.getElementById('login-btn');
-const logoutBtn = document.getElementById('logout-btn');
-const userInfo = document.getElementById('user-info');
-const userName = document.getElementById('user-name');
-// Aggiungi un id="scheda-container" al div che contiene tutta la tua scheda nell'HTML
-const schedaContainer = document.getElementById('scheda-container');
-
+// Funzione per aggiornare la UI in base allo stato di login
+function updateUI(user) {
+    if (user) {
+        // Mostra gli elementi per l'utente loggato
+        ui.loginBtn.style.display = 'none';
+        ui.logoutBtn.style.display = 'block';
+        ui.userInfo.style.display = 'block';
+        ui.userName.textContent = user.displayName;
+        if (ui.schedaContainer) ui.schedaContainer.style.display = 'block';
+    } else {
+        // Mostra gli elementi per l'utente non loggato
+        ui.loginBtn.style.display = 'block';
+        ui.logoutBtn.style.display = 'none';
+        ui.userInfo.style.display = 'none';
+        if (ui.schedaContainer) ui.schedaContainer.style.display = 'none';
+    }
+}
 
 // --- 3. LOGICA DI AUTENTICAZIONE ---
-loginBtn.addEventListener('click', () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(error => console.error("Errore Login:", error));
+ui.loginBtn.addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(error => console.error("Errore Login:", error));
 });
 
-logoutBtn.addEventListener('click', () => {
-  auth.signOut().catch(error => console.error("Errore Logout:", error));
+ui.logoutBtn.addEventListener('click', () => {
+    auth.signOut().catch(error => console.error("Errore Logout:", error));
 });
 
+// --- 4. GESTIONE DEI DATI DELLA SCHEDA ---
 
-// --- 4. GESTORE PRINCIPALE (IL CUORE DELL'APP) ---
-auth.onAuthStateChanged(user => {
-  if (user) { // Utente loggato
-    console.log("Utente loggato:", user.displayName);
-    loginBtn.style.display = 'none';
-    logoutBtn.style.display = 'block';
-    userInfo.style.display = 'block';
-    userName.textContent = user.displayName;
-    schedaContainer.style.display = 'block';
-    caricaDati(user.uid); // Carica i dati per questo utente
-  } else { // Utente non loggato
-    console.log("Nessun utente loggato.");
-    loginBtn.style.display = 'block';
-    logoutBtn.style.display = 'none';
-    userInfo.style.display = 'none';
-    schedaContainer.style.display = 'none';
-  }
-});
+// !! IMPORTANTE: PERSONALIZZA QUESTA LISTA CON GLI ID DEI TUOI CAMPI !!
+const campiDaSalvare = ['peso-panca', 'peso-squat', 'peso-rematore']; // <-- MODIFICA QUESTA!
 
-
-// --- 5. LOGICA DI SALVATAGGIO E CARICAMENTO DATI SU FIREBASE ---
-
-// La lista degli ID che vogliamo salvare (nota che è ancora qui, ma usata in modo diverso!)
-const campiDaSalvare = ['peso-panca', 'peso-squat', 'peso-rematore']; // PERSONALIZZA QUESTA LISTA!
-
-function salvaDati(userId) {
-  const datiScheda = {};
-  campiDaSalvare.forEach(id => {
-    const inputElement = document.getElementById(id);
-    if (inputElement) datiScheda[id] = inputElement.value;
-  });
-  console.log("Salvataggio su Firebase:", datiScheda);
-  db.collection('schede').doc(userId).set(datiScheda, { merge: true })
-    .catch(error => console.error("Errore nel salvataggio:", error));
-}
-
-function caricaDati(userId) {
-  db.collection('schede').doc(userId).onSnapshot(doc => {
-    if (doc.exists) {
-      const datiSalvati = doc.data();
-      console.log("Dati caricati da Firebase:", datiSalvati);
-      campiDaSalvare.forEach(id => {
+// Funzione che "attacca" gli eventi di salvataggio ai campi.
+// Verrà chiamata SOLO DOPO il login.
+function setupEventListeners(userId) {
+    campiDaSalvare.forEach(id => {
         const inputElement = document.getElementById(id);
-        if (inputElement && datiSalvati[id] !== undefined) {
-          inputElement.value = datiSalvati[id];
+        if (inputElement) {
+            inputElement.addEventListener('change', (event) => {
+                const datiDaSalvare = { [id]: event.target.value };
+                db.collection('schede').doc(userId).set(datiDaSalvare, { merge: true })
+                  .then(() => console.log(`Salvato ${id}: ${event.target.value}`))
+                  .catch(error => console.error("Errore nel salvataggio:", error));
+            });
         }
-      });
-    } else {
-      console.log("Nessun dato pre-esistente per questo utente.");
-    }
-  });
+    });
 }
 
-// Aggiungiamo gli "ascoltatori" ai campi per triggerare il salvataggio
-campiDaSalvare.forEach(id => {
-  const inputElement = document.getElementById(id);
-  if (inputElement) {
-    inputElement.addEventListener('change', () => {
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        salvaDati(currentUser.uid);
-      }
-    });
-  }
+// Funzione che carica i dati e li mette nei campi.
+function loadUserData(userId) {
+    const docRef = db.collection('schede').doc(userId);
+    docRef.get().then(doc => {
+        if (doc.exists) {
+            const datiSalvati = doc.data();
+            console.log("Dati caricati da Firebase:", datiSalvati);
+            campiDaSalvare.forEach(id => {
+                const inputElement = document.getElementById(id);
+                if (inputElement && datiSalvati[id] !== undefined) {
+                    inputElement.value = datiSalvati[id];
+                }
+            });
+        } else {
+            console.log("Nessun dato pre-esistente per questo utente.");
+        }
+    }).catch(error => console.error("Errore nel caricamento dati:", error));
+}
+
+
+// --- 5. CUORE DELL'APPLICAZIONE ---
+// Questo gestore centrale orchestra tutto.
+auth.onAuthStateChanged(user => {
+    updateUI(user); // Aggiorna sempre la UI
+
+    if (user) {
+        // Se l'utente è loggato:
+        console.log("Utente loggato:", user.displayName, user.uid);
+        loadUserData(user.uid);      // 1. Carica i suoi dati
+        setupEventListeners(user.uid); // 2. Attiva il salvataggio automatico
+    } else {
+        // Se l'utente non è loggato:
+        console.log("Nessun utente loggato.");
+        // Non facciamo nient'altro, la UI è già a posto.
+    }
 });
