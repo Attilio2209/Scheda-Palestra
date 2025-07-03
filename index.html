@@ -8,23 +8,18 @@
 </head>
 <body>
 
-
-    <!-- ========================================================== -->
-    <!-- ====== BLOCCO DI CODICE DA AGGIUNGERE ====================== -->
-    <!-- ========================================================== -->
-    <div id="auth-container" style="padding: 10px; text-align: center; background-color: #f0f0f0;">
-        <div id="user-info" style="display:none;">
+    <!-- ======================================================= -->
+    <!-- ====== BLOCCO DA AGGIUNGERE PER IL LOGIN/LOGOUT ======= -->
+    <!-- ======================================================= -->
+    <div id="auth-container">
+        <div id="user-info">
             <p>Ciao, <span id="user-name"></span>!</p>
             <button id="logout-btn">Esci</button>
         </div>
         <button id="login-btn">Accedi con Google</button>
     </div>
-    <!-- ========================================================== -->
-    <!-- ========================================================== -->
+    <!-- ======================================================= -->
 
-
-    
-        <!-- ...tutto il resto della tua scheda... -->
     <div class="container">
 
         <!-- VISTA 1: SELEZIONE GIORNO -->
@@ -138,16 +133,15 @@
         </div>
 
     </div>
-    <!-- ======================= CODICE FIREBASE ======================= -->
+        <!-- ...tutto il resto del tuo HTML... -->
 
-<!-- Firebase SDK (Software Development Kit) -->
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <!-- 1. PRIMA CARICHI LE LIBRERIE DI FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
 
-
-
-<!-- =============================================================== -->
+    <!-- 2. DOPO CARICHI IL TUO SCRIPT, CON L'ATTRIBUTO 'defer' -->
     <script src="script.js" defer></script>
+
 </body>
 </html>
