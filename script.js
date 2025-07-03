@@ -10,76 +10,79 @@ document.addEventListener('DOMContentLoaded', () => {
         appId: "1:72763855410:web:280b8c2902f7bb60f2a22b",
         measurementId: "G-LZBSX8FSPN"
     };
-    firebase.initializeApp(firebaseConfig);
+    const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
+    const db = firebase.firestore(app);
 
-    // Riferimenti agli elementi del DOM (dal tuo codice originale)
-    const views = document.querySelectorAll('.view');
-    const daySelector = document.getElementById('day-selector');
-    const showWorkoutBtn = document.getElementById('show-workout-btn');
-    const goToEditorBtn = document.getElementById('go-to-editor-btn');
-    const listDayTitle = document.getElementById('list-day-title');
-    const exerciseList = document.getElementById('exercise-list');
-    const backToDaySelectionBtn = document.getElementById('back-to-day-selection-btn');
-    const detailExerciseName = document.getElementById('detail-exercise-name');
-    const detailPhoto = document.getElementById('detail-photo');
-    const detailView = document.getElementById('view-exercise-detail');
-    const markAsDoneBtn = document.getElementById('mark-as-done-btn');
-    const backToListBtn = document.getElementById('back-to-list-btn');
-    const addExerciseForm = document.getElementById('add-exercise-form');
-    const existingExercisesList = document.getElementById('existing-exercises-list');
-    const backFromEditorBtn = document.getElementById('back-from-editor-btn');
-    const creationDateEl = document.getElementById('creation-date');
-    const usageCountEl = document.getElementById('usage-count');
-    // Elementi di login
-    const loginBtn = document.getElementById('login-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    const authContainer = document.getElementById('auth-container');
-    const schedaContainer = document.querySelector('.container');
-    const userName = document.getElementById('user-name');
-    const userInfo = document.getElementById('user-info');
-    
+    // Riferimenti agli elementi del DOM
+    const elements = {
+        views: document.querySelectorAll('.view'),
+        daySelector: document.getElementById('day-selector'),
+        showWorkoutBtn: document.getElementById('show-workout-btn'),
+        goToEditorBtn: document.getElementById('go-to-editor-btn'),
+        listDayTitle: document.getElementById('list-day-title'),
+        exerciseList: document.getElementById('exercise-list'),
+        backToDaySelectionBtn: document.getElementById('back-to-day-selection-btn'),
+        detailExerciseName: document.getElementById('detail-exercise-name'),
+        detailPhoto: document.getElementById('detail-photo'),
+        detailView: document.getElementById('view-exercise-detail'),
+        markAsDoneBtn: document.getElementById('mark-as-done-btn'),
+        backToListBtn: document.getElementById('back-to-list-btn'),
+        addExerciseForm: document.getElementById('add-exercise-form'),
+        existingExercisesList: document.getElementById('existing-exercises-list'),
+        backFromEditorBtn: document.getElementById('back-from-editor-btn'),
+        creationDateEl: document.getElementById('creation-date'),
+        usageCountEl: document.getElementById('usage-count'),
+        loginBtn: document.getElementById('login-btn'),
+        logoutBtn: document.getElementById('logout-btn'),
+        authContainer: document.getElementById('auth-container'),
+        schedaContainer: document.querySelector('.container'),
+        userName: document.getElementById('user-name'),
+        userInfo: document.getElementById('user-info')
+    };
+
     // Variabili di stato
     let workoutPlan = {};
     let sessionState = {};
     let currentDay = '';
     let currentExerciseId = null;
-    let currentUserId = null; 
+    let currentUserId = null;
 
-    // --- 2. FUNZIONI DELLA TUA APP (logica originale) ---
+    // --- 2. FUNZIONI DELLA TUA APP (logica originale intatta) ---
     function showView(viewId) {
-        views.forEach(view => view.classList.remove('active'));
+        elements.views.forEach(view => view.classList.remove('active'));
         const viewToShow = document.getElementById(viewId);
-        if(viewToShow) viewToShow.classList.add('active');
-    }
-    
-    function updateMetadata() {
-        if (workoutPlan && workoutPlan.metadata) {
-            creationDateEl.textContent = workoutPlan.metadata.creationDate || '--';
-            usageCountEl.textContent = workoutPlan.metadata.usageCount || '0';
+        if (viewToShow) {
+            viewToShow.classList.add('active');
         }
     }
-    
+
+    function updateMetadata() {
+        if (workoutPlan && workoutPlan.metadata) {
+            elements.creationDateEl.textContent = workoutPlan.metadata.creationDate || '--';
+            elements.usageCountEl.textContent = workoutPlan.metadata.usageCount || '0';
+        }
+    }
+
     function renderExerciseList(day) {
         currentDay = day;
-        listDayTitle.textContent = `Allenamento di ${day}`;
-        exerciseList.innerHTML = ''; 
-        if (!workoutPlan.schedule || !workoutPlan.schedule[day]) {
-            exerciseList.innerHTML = '<li>Nessun esercizio definito per questo giorno.</li>';
+        elements.listDayTitle.textContent = `Allenamento di ${day}`;
+        elements.exerciseList.innerHTML = '';
+        if (!workoutPlan.schedule || !workoutPlan.schedule[day] || workoutPlan.schedule[day].length === 0) {
+            elements.exerciseList.innerHTML = '<li>Nessun esercizio definito per questo giorno.</li>';
         } else {
             sessionState.exercises = JSON.parse(JSON.stringify(workoutPlan.schedule[day]));
             sessionState.exercises.forEach(ex => ex.eseguito = false);
             const exercisesToShow = sessionState.exercises.filter(ex => !ex.eseguito);
             if (exercisesToShow.length === 0) {
-                exerciseList.innerHTML = '<li>Nessun esercizio per oggi, o hai già finito tutto! 🎉</li>';
+                elements.exerciseList.innerHTML = '<li>Hai già finito tutti gli esercizi per oggi! 🎉</li>';
             } else {
-                exercisesToShow.forEach((exercise) => {
+                exercisesToShow.forEach(exercise => {
                     const li = document.createElement('li');
                     li.textContent = exercise.nome;
                     li.dataset.id = exercise.id;
                     li.addEventListener('click', () => { currentExerciseId = exercise.id; renderExerciseDetail(); });
-                    exerciseList.appendChild(li);
+                    elements.exerciseList.appendChild(li);
                 });
             }
         }
@@ -89,8 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderExerciseDetail() {
         const exercise = sessionState.exercises.find(ex => ex.id === currentExerciseId);
         if (!exercise) return;
-        detailExerciseName.textContent = exercise.nome;
-        detailPhoto.src = exercise.foto || 'https://via.placeholder.com/300x200.png?text=Nessuna+Immagine';
+        elements.detailExerciseName.textContent = exercise.nome;
+        elements.detailPhoto.src = exercise.foto || 'https://via.placeholder.com/300x200.png?text=Nessuna+Immagine';
         document.getElementById('detail-sets').textContent = exercise.set;
         document.getElementById('detail-reps').value = exercise.ripetute;
         document.getElementById('detail-duration').value = exercise.durata || '';
@@ -99,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
         showView('view-exercise-detail');
     }
 
+    // ... (le tue altre funzioni originali: updateExerciseValue, markAsDone, etc. restano qui)
+    // Ho rimosso le altre per brevità, ma nel tuo file devi tenerle
     function updateExerciseValue(field, value) {
         const masterExercise = workoutPlan.schedule[currentDay].find(ex => ex.id === currentExerciseId);
         if (!masterExercise) return;
@@ -112,40 +117,24 @@ document.addEventListener('DOMContentLoaded', () => {
             masterExercise[field] = value;
         }
         sessionExercise[field] = masterExercise[field];
-        savePlanToFirebase();
+        savePlan();
         renderExerciseDetail();
     }
-
     function markAsDone() {
         const exerciseIndex = sessionState.exercises.findIndex(ex => ex.id === currentExerciseId);
         if (exerciseIndex !== -1) sessionState.exercises[exerciseIndex].eseguito = true;
         if (!sessionState.usageCounted) {
              workoutPlan.metadata.usageCount = (workoutPlan.metadata.usageCount || 0) + 1;
              sessionState.usageCounted = true;
-             savePlanToFirebase();
+             savePlan();
         }
         renderExerciseList(currentDay); 
         showView('view-exercise-list');
     }
-
     function addExercise(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const day = formData.get('giorno');
-
-    // --- CORREZIONE FINALE ---
-    // 1. Controlliamo se 'schedule' esiste. Se no, lo creiamo.
-    if (!workoutPlan.schedule) {
-        workoutPlan.schedule = {};
-    }
-
-    // 2. Controlliamo se l'array per il giorno specifico esiste. Se no, lo creiamo.
-    //    (Questo controllo ora è sicuro perché sappiamo che .schedule esiste)
-    if (!workoutPlan.schedule[day]) {
-        workoutPlan.schedule[day] = [];
-    }
-    // --- FINE CORREZIONE ---
-
     const exercise = {
         id: Date.now(),
         giorno: day,
@@ -159,106 +148,146 @@ document.addEventListener('DOMContentLoaded', () => {
         eseguito: false
     };
 
+    // --- CONTROLLO DI SICUREZZA AGGIUNTO ---
+    // Se workoutPlan.schedule non esiste, lo creiamo.
+    if (!workoutPlan.schedule) {
+        workoutPlan.schedule = { "Lunedì": [], "Martedì": [], "Mercoledì": [], "Giovedì": [], "Venerdì": [], "Sabato": [], "Domenica": [] };
+    }
+    // Se il giorno specifico non esiste come array, lo creiamo.
+    if (!workoutPlan.schedule[day]) {
+        workoutPlan.schedule[day] = [];
+    }
+    // --- FINE CONTROLLO ---
+
     workoutPlan.schedule[day].push(exercise);
-    
-    savePlanToFirebase();
+    savePlanToFirebase(); // <- Ho rinominato la funzione savePlan per chiarezza
     renderEditor();
     event.target.reset();
 }
-    
     function deleteExercise(day, exerciseId) {
         workoutPlan.schedule[day] = workoutPlan.schedule[day].filter(ex => ex.id !== exerciseId);
         savePlanToFirebase();
         renderEditor();
     }
+  function renderEditor() {
+    elements.existingExercisesList.innerHTML = '';
 
-    function renderEditor() {
-        existingExercisesList.innerHTML = '';
-        const schedule = workoutPlan.schedule || {};
-        Object.keys(schedule).forEach(day => {
-            if (schedule[day].length > 0) {
-                const dayHeader = document.createElement('h4');
-                dayHeader.textContent = day;
-                existingExercisesList.appendChild(dayHeader);
-                schedule[day].forEach(exercise => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'exercise-item';
-                    itemDiv.innerHTML = `<span>${exercise.nome}</span>`;
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.textContent = 'Elimina';
-                    deleteBtn.addEventListener('click', () => deleteExercise(day, exercise.id));
-                    itemDiv.appendChild(deleteBtn);
-                    existingExercisesList.appendChild(itemDiv);
-                });
-            }
-        });
-        showView('view-editor');
+    // --- CONTROLLO DI SICUREZZA AGGIUNTO ---
+    // Se workoutPlan o workoutPlan.schedule non esistono, non fare nulla ed esci.
+    if (!workoutPlan || !workoutPlan.schedule) {
+        console.error("Impossibile renderizzare l'editor: workoutPlan.schedule non è definito.");
+        showView('view-editor'); // Mostriamo comunque la vista vuota
+        return; 
     }
+    // --- FINE CONTROLLO ---
+
+    Object.keys(workoutPlan.schedule).forEach(day => {
+        if (workoutPlan.schedule[day] && workoutPlan.schedule[day].length > 0) {
+            const dayHeader = document.createElement('h4');
+            dayHeader.textContent = day;
+            elements.existingExercisesList.appendChild(dayHeader);
+            workoutPlan.schedule[day].forEach(exercise => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'exercise-item';
+                itemDiv.innerHTML = `<span>${exercise.nome}</span>`;
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Elimina';
+                deleteBtn.addEventListener('click', () => deleteExercise(day, exercise.id));
+                itemDiv.appendChild(deleteBtn);
+                elements.existingExercisesList.appendChild(itemDiv);
+            });
+        }
+    });
+    showView('view-editor');
+}
+    // --- FINE FUNZIONI ORIGINALI ---
+
 
     // --- 3. LOGICA FIREBASE ---
     function savePlanToFirebase() {
         if (currentUserId) {
+            console.log("Salvataggio su Firebase in corso...", workoutPlan);
             db.collection('userPlans').doc(currentUserId).set(workoutPlan)
                 .catch(err => console.error("Errore salvataggio:", err));
         }
     }
 
-    function loadPlanFromFirebase(userId) {
+    async function loadPlan(userId) {
         const docRef = db.collection('userPlans').doc(userId);
-        docRef.get().then(doc => {
+        try {
+            const doc = await docRef.get();
             if (doc.exists) {
+                console.log("Dati trovati su Firebase. Caricamento...");
                 workoutPlan = doc.data();
             } else {
+                console.log("Nessun dato. Creo una scheda vuota per il nuovo utente.");
                 workoutPlan = {
                     metadata: { creationDate: new Date().toLocaleDateString('it-IT'), usageCount: 0 },
                     schedule: { "Lunedì": [], "Martedì": [], "Mercoledì": [], "Giovedì": [], "Venerdì": [], "Sabato": [], "Domenica": [] }
                 };
-                savePlanToFirebase();
+                await savePlanToFirebase(); // Aspetta che il salvataggio sia completo
             }
-            updateMetadata();
-            showView('view-day-selection');
-        }).catch(err => console.error("Errore caricamento:", err));
+        } catch (error) {
+            console.error("Errore caricamento dati:", error);
+            // Gestisci l'errore, magari mostrando un messaggio all'utente
+        }
     }
 
+    function resetAppState() {
+        workoutPlan = {};
+        sessionState = {};
+        currentDay = '';
+        currentExerciseId = null;
+        console.log("Stato dell'applicazione resettato.");
+    }
+
+
     // --- 4. CUORE DELL'APP: GESTORE AUTENTICAZIONE ---
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(async (user) => {
         if (user) {
+            // Utente è loggato
             currentUserId = user.uid;
-            authContainer.classList.add('logged-in');
-            userName.textContent = user.displayName;
-            schedaContainer.style.display = 'block';
-            loadPlanFromFirebase(user.uid);
+            elements.authContainer.classList.add('logged-in');
+            elements.userName.textContent = user.displayName;
+            
+            await loadPlan(user.uid); // **CRUCIALE**: Aspetta che i dati siano caricati
+            
+            updateMetadata(); // Ora aggiorna la UI con i dati certi
+            elements.schedaContainer.style.display = 'block';
+            showView('view-day-selection'); // E mostra la vista iniziale
+            
         } else {
+            // Utente non è loggato
             currentUserId = null;
-            authContainer.classList.remove('logged-in');
-            schedaContainer.style.display = 'none';
-            // Non chiamiamo showView qui per non mostrare nulla quando si è sloggati
+            elements.authContainer.classList.remove('logged-in');
+            elements.schedaContainer.style.display = 'none';
+            resetAppState(); // Pulisce i dati della sessione precedente
         }
     });
 
-    // --- 5. EVENT LISTENERS (Originali + Login) ---
-    loginBtn.addEventListener('click', () => {
+
+    // --- 5. EVENT LISTENERS ---
+    elements.loginBtn.addEventListener('click', () => {
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
     });
-    logoutBtn.addEventListener('click', () => auth.signOut());
-    
-    showWorkoutBtn.addEventListener('click', () => renderExerciseList(daySelector.value));
-    goToEditorBtn.addEventListener('click', renderEditor);
-    backToDaySelectionBtn.addEventListener('click', () => showView('view-day-selection'));
-    backToListBtn.addEventListener('click', () => renderExerciseList(currentDay));
-    backFromEditorBtn.addEventListener('click', () => showView('view-day-selection'));
-    markAsDoneBtn.addEventListener('click', markAsDone);
-    addExerciseForm.addEventListener('submit', addExercise);
-
-    detailView.addEventListener('click', (e) => {
-        if (e.target.matches('.stepper-btn')) {
-            updateExerciseValue(e.target.dataset.field, parseFloat(e.target.dataset.step));
-        }
+    elements.logoutBtn.addEventListener('click', () => {
+        console.log("Logout in corso...");
+        auth.signOut();
     });
-    detailView.addEventListener('change', (e) => {
-        if (e.target.matches('.editable-field')) {
-            updateExerciseValue(e.target.id.replace('detail-', ''), e.target.value);
-        }
+    
+    // I tuoi listeners originali
+    elements.showWorkoutBtn.addEventListener('click', () => renderExerciseList(elements.daySelector.value));
+    elements.goToEditorBtn.addEventListener('click', renderEditor);
+    elements.backToDaySelectionBtn.addEventListener('click', () => showView('view-day-selection'));
+    elements.backToListBtn.addEventListener('click', () => renderExerciseList(currentDay));
+    elements.backFromEditorBtn.addEventListener('click', () => showView('view-day-selection'));
+    elements.markAsDoneBtn.addEventListener('click', markAsDone);
+    elements.addExerciseForm.addEventListener('submit', addExercise);
+    elements.detailView.addEventListener('click', (e) => {
+        if (e.target.matches('.stepper-btn')) { updateExerciseValue(e.target.dataset.field, parseFloat(e.target.dataset.step)); }
+    });
+    elements.detailView.addEventListener('change', (e) => {
+        if (e.target.matches('.editable-field')) { updateExerciseValue(e.target.id.replace('detail-', ''), e.target.value); }
     });
 });
