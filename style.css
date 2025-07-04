@@ -136,38 +136,41 @@ hr { border: none; border-top: 1px solid #ddd; margin: 25px 0; }
     margin: 0;
 }
 /* ================================== */
-/* REGOLE PER SCHERMI PICCOLI (MOBILE) */
+/* REGOLE PER SCHERMI PICCOLI (MOBILE) - VERSIONE MIGLIORE */
 /* ================================== */
 
-/* Si applicano solo se lo schermo è più stretto di 600px */
 @media (max-width: 600px) {
 
     /* Contenitore dell'autenticazione */
     #auth-container {
-        /* Usa Flexbox per gestire l'allineamento */
+        /* Centra tutto il blocco del login */
         display: flex;
-        flex-direction: column; /* Mette gli elementi uno sopra l'altro */
-        align-items: center;    /* Li centra orizzontalmente */
-        gap: 10px;              /* Aggiunge spazio tra di loro */
+        justify-content: center; /* Allinea orizzontalmente al centro */
+        align-items: center;    /* Allinea verticalmente al centro */
+        padding: 15px;
+    }
+    
+    /* Il blocco con "Ciao" e "Esci" */
+    #user-info {
+       display: flex;
+       align-items: center;
+       gap: 10px; /* Spazio tra "Ciao" e "Esci" */
     }
 
-    /* Stile per i bottoni di login/logout su mobile */
+    /* Nascondiamo il nome per recuperare spazio */
+    #user-info p {
+        display: none;
+    }
+
+    /* Stile per i bottoni */
     #login-btn, #logout-btn {
-        width: 80%; /* Occupa l'80% della larghezza */
-        max-width: 300px; /* Ma non più di 300px */
-        padding: 12px;
-        font-size: 16px;
-        margin: 0; /* Rimuoviamo il margine che avevano di default */
+        width: auto;
+        padding: 10px 20px;
+        margin: 0;
     }
-    
-    #user-info {
-        flex-direction: column; /* Anche qui, mettiamo "Ciao..." e "Esci" uno sopra l'altro */
-        gap: 10px;
-    }
-    
-    /* Riduce i margini del contenitore principale per dare più spazio */
-    .container { 
-        margin: 15px; 
-        padding: 20px;
+
+    .container {
+        margin: 10px;
+        padding: 15px;
     }
 }
