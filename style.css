@@ -6,8 +6,10 @@ body {
     margin: 0;
     padding: 20px;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    /* --- MODIFICHE QUI SOTTO --- */
+    flex-direction: column; /* Mette i blocchi uno sopra l'altro */
+    align-items: center;    /* Li centra orizzontalmente */
+    /* --- FINE MODIFICHE --- */
     min-height: 100vh;
 }
 .container {
@@ -143,12 +145,21 @@ hr { border: none; border-top: 1px solid #ddd; margin: 25px 0; }
 
     /* Contenitore dell'autenticazione */
     #auth-container {
-        /* Centra tutto il blocco del login */
-        display: flex;
-        justify-content: center; /* Allinea orizzontalmente al centro */
-        align-items: center;    /* Allinea verticalmente al centro */
-        padding: 15px;
-    }
+    padding: 15px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+
+    /* --- AGGIUNTE IMPORTANTI QUI SOTTO --- */
+    width: 100%;             /* Occupa tutta la larghezza disponibile... */
+    max-width: 500px;        /* ...ma non più di 500px (come la scheda) */
+    box-sizing: border-box;  /* Per non creare problemi con il padding */
+    margin-bottom: 20px;     /* Aggiunge spazio sotto, prima della scheda */
+    
+    /* Aggiungiamo anche lo stile della card per coerenza */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
     
     /* Il blocco con "Ciao" e "Esci" */
     #user-info {
