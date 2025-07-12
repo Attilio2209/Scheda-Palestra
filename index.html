@@ -98,7 +98,20 @@
                     </div>
                 </div>
             </div>
-            
+            <!-- NUOVO: Campo Note -->
+<!-- SOSTITUISCI IL TUO BLOCCO <div class="...note-section"> CON QUESTO -->
+
+<!-- 1. Per visualizzare le note salvate dall'editor -->
+<div class="detail-item">
+    <strong>Note/Descrizione:</strong>
+    <p id="detail-description" style="white-space: pre-wrap; margin-top: 5px;"></p>
+</div>
+
+<!-- 2. Per scrivere note temporanee durante la sessione -->
+<div class="detail-item note-section">
+    <label for="detail-session-notes">Note di oggi (non salvate):</label>
+    <textarea id="detail-session-notes" rows="3" placeholder="Peso usato, sensazioni..."></textarea>
+</div>
             <button id="mark-as-done-btn">ESEGUITO</button>
         </div>
 
@@ -125,6 +138,7 @@
                 <input type="number" name="peso" placeholder="Peso (Kg)">
                 <input type="number" name="recupero" placeholder="Recupero (secondi)" required>
                 <input type="url" name="foto" placeholder="URL Foto Esercizio">
+                <textarea name="note" rows="4" placeholder="Note esplicative dell'esercizio..."></textarea>
                 <button type="submit">Aggiungi Esercizio</button>
             </form>
             <hr>
@@ -145,3 +159,4 @@
 
 </body>
 </html>
+ 
